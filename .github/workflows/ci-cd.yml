@@ -4,7 +4,6 @@ on:
   push:
     branches: [main, master]
   pull_request:
-
     branches: [main, master]
 
 jobs:
@@ -39,61 +38,96 @@ jobs:
 
       - name: Check project structure
         run: |
-          echo "=== Required files ==="
-          test -f index.html && echo "OK: index.html" || (echo "MISSING: index.html" && exit 1)
-          test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING: side-projects.html" && exit 1)
-          test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING: portfolio.css" && exit 1)
-          test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING: .gitignore" && exit 1)
-          echo ""
+          test -f index.html && echo "OK: index.html" || (echo "MISSING" && exit 1)
+          test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING" && exit 1)
+          test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING" && exit 1)
+          test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING" && exit 1)
           echo "OK: all checks passed"
 
   # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS
+  # Job 2: Deploy to VPS via Cloudflare Tunnel
   # ═══════════════════════════════════════════════════
   deploy:
     name: Deploy to VPS
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    environment: github-pages
+    environment: .env
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            set -e
+      - name: Setup SSH config
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
 
-            DEPLOY_DIR="/var/www/portfolio"
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
 
-            echo "=== Portfolio Deploy ==="
-            echo "Branch: ${{ github.ref_name }}"
-            echo "Commit: ${{ github.sha }}"
-            echo "Host:   $(hostname)"
-            echo "Date:   $(date)"
+      - name: Deploy via Cloudflare Tunnel
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -e
 
-            if [ ! -d "$DEPLOY_DIR" ]; then
-              sudo mkdir -p "$DEPLOY_DIR"
-              sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
-              cd "$DEPLOY_DIR"
-              git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" .
-            fi
+          # Strip any protocol prefix from host
+          HOST=$(echo "$VPS_HOST" | sed 's|^tcp//*||' | sed 's|^https*://||' | sed 's|:$||')
 
-            cd "$DEPLOY_DIR"
-            git fetch origin
-            git checkout "${{ github.ref_name }}"
-            git pull origin "${{ github.ref_name }}"
+          echo "=== Portfolio Deploy ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Host:   $HOST"
+          echo "User:   $VPS_USER"
+          echo "Date:   $(date)"
+          echo ""
 
-            chmod -R 755 .
+          # Create SSH config with Cloudflare Tunnel proxy
+          cat > ~/.ssh/config <<SSHEOF
+          Host portfolio-vps
+            HostName $HOST
+            User $VPS_USER
+            ProxyCommand cloudflared access ssh --hostname %h \
+              --service-token-id ${CF_ACCESS_CLIENT_ID} \
+              --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+          SSHEOF
+          chmod 600 ~/.ssh/config
 
-            if command -v nginx &> /dev/null; then
-              sudo nginx -t && sudo systemctl reload nginx
-            fi
+          # Create deploy directory if needed
+          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio" || true
 
-            echo "=== Deploy complete ==="
+          # Sync files
+          echo "[1/2] Syncing files..."
+          rsync -avz --delete \
+            -e "ssh -F ~/.ssh/config" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.vscode' \
+            --exclude='.gitignore' \
+            --exclude='deploy.sh' \
+            --exclude='nginx.conf' \
+            --exclude='README.md' \
+            --exclude='node_modules' \
+            ./ "portfolio-vps:/var/www/portfolio/"
+
+          # Set permissions and reload nginx
+          echo "[2/2] Setting permissions and reloading nginx..."
+          ssh portfolio-vps "chmod -R 755 /var/www/portfolio && sudo nginx -t && sudo systemctl reload nginx" || true
+
+          echo ""
+          echo "=== Deploy complete ==="
