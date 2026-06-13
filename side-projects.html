@@ -54,7 +54,7 @@
   <!-- ════════════════════════════════════════════
        MOE SYSTEM NOTE
        ════════════════════════════════════════════ -->
-  <section class="section" style="padding-top: 0;">
+  <section class="section section--no-top">
     <div class="container">
       <div class="side-projects-note">
         <span class="side-projects-note__icon">🦐</span>
@@ -64,9 +64,9 @@
             an orchestration system of <strong>39 specialized AI agents</strong> (Mixture of Experts) 
             built on top of the <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> framework.
           </p>
-          <p style="margin-top: 0.75rem;">
+          <p class="side-projects-note__sub">
             Each project leverages dedicated agents for <strong>backend development</strong>, <strong>frontend engineering</strong>, 
-            <strong>DevOps & infrastructure</strong>, <strong>code review & QA</strong>, <strong>security analysis</strong>, 
+            <strong>DevOps &amp; infrastructure</strong>, <strong>code review &amp; QA</strong>, <strong>security analysis</strong>, 
             <strong>documentation</strong>, and <strong>architecture design</strong> — organized across 7 specialized layers. 
             The system uses OpenRouter with automatic key rotation across 12 API keys for high availability.
           </p>
@@ -78,7 +78,7 @@
   <!-- ════════════════════════════════════════════
        SIDE PROJECTS GRID
        ════════════════════════════════════════════ -->
-  <section class="section" style="padding-top: 0;">
+  <section class="section section--no-top">
     <div class="container">
       <div class="projects-grid">
 
@@ -102,7 +102,7 @@
               two-tier patterns, and a dark-themed React frontend. Deployed on Oracle VPS via 
               Cloudflare Tunnel.
             </p>
-            <p class="project-card__desc" style="margin-top: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            <p class="project-card__stack">
               Stack: Python · FastAPI · React · Vite · TailwindCSS · Docker Compose · Nginx · Cloudflare Tunnel · OpenRouter
             </p>
             <div class="project-card__links">
@@ -117,8 +117,8 @@
         <!-- Media Handler -->
         <article class="project-card">
           <a href="https://mediahandler.shrimpdev.com" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img" style="background: linear-gradient(135deg, #1e1e26 0%, #ff6b35 100%); display: flex; align-items: center; justify-content: center;">
-              <span style="font-family: var(--font-display); font-size: 1.5rem; font-weight: 800; color: #fff;">MH</span>
+            <div class="project-card__img project-card__img--gradient-orange">
+              <span project-card__img-text>MH</span>
             </div>
           </a>
           <div class="project-card__body">
@@ -134,7 +134,7 @@
               with AI-powered features. Built with modern web technologies and deployed on Oracle 
               VPS infrastructure with Cloudflare Tunnel for secure access.
             </p>
-            <p class="project-card__desc" style="margin-top: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            <p class="project-card__stack">
               Stack: Python · FastAPI · React · Docker · Cloudflare Tunnel
             </p>
             <div class="project-card__links">
@@ -149,8 +149,8 @@
         <!-- Multi-Agent MoE System -->
         <article class="project-card">
           <a href="https://github.com/pattrickx" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img" style="background: linear-gradient(135deg, #0d0d0f 0%, #1e1e26 50%, #ff6b35 100%); display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 3rem;">🎼</span>
+            <div class="project-card__img project-card__img--gradient-dark">
+              <span class="project-card__img-text project-card__img-text--lg">🎼</span>
             </div>
           </a>
           <div class="project-card__body">
@@ -168,7 +168,7 @@
               MoE (Mixture of Experts) scoring for intelligent task routing. Features automatic 
               OpenRouter key rotation across 12 API keys.
             </p>
-            <p class="project-card__desc" style="margin-top: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            <p class="project-card__stack">
               Stack: Hermes Agent · OpenRouter · Python · 39 Agent Profiles · MoE Scoring
             </p>
             <div class="project-card__links">
@@ -198,7 +198,7 @@
               numpy, scikit-learn, imbalanced-learn, SHAP, and matplotlib/seaborn. Includes 
               code examples in Markdown with equivalent scripts for reproducible workflows.
             </p>
-            <p class="project-card__desc" style="margin-top: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            <p class="project-card__stack">
               Stack: Python · pandas · scikit-learn · SHAP · matplotlib
             </p>
             <div class="project-card__links">
@@ -213,8 +213,8 @@
         <!-- General Utils -->
         <article class="project-card">
           <a href="https://github.com/pattrickx" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img" style="background: linear-gradient(135deg, #1b1b21 0%, #2a2a35 100%); display: flex; align-items: center; justify-content: center;">
-              <span style="font-size: 3rem;">🛠️</span>
+            <div class="project-card__img project-card__img--gradient-slate">
+              <span class="project-card__img-text project-card__img-text--lg">🛠️</span>
             </div>
           </a>
           <div class="project-card__body">
@@ -224,14 +224,14 @@
               <span class="project-card__tag">DevOps</span>
               <span class="project-card__tag">Open Source</span>
             </div>
-            <h3 class="project-card__title"><a href="https://github.com/pattrickx" target="_blank" rel="noopener">General Utils & Design System</a></h3>
+            <h3 class="project-card__title"><a href="https://github.com/pattrickx" target="_blank" rel="noopener">General Utils &amp; Design System</a></h3>
             <p class="project-card__desc">
               A centralized repository of reusable utilities, protocols, and design assets. Includes 
               the Shrimp Dev Design System (CSS, HTML, brand identity), Python utilities (API key 
               rotation, input sanitization), infrastructure templates (Docker, CI/CD, Nginx), and 
               agent protocols for AI-assisted development.
             </p>
-            <p class="project-card__desc" style="margin-top: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--muted);">
+            <p class="project-card__stack">
               Stack: Python · CSS · Docker · GitHub Actions · Nginx · Protocols
             </p>
             <div class="project-card__links">
@@ -254,7 +254,7 @@
     <div class="container">
       <h2 class="section__title">Tech Stack</h2>
       <p class="section__subtitle">Technologies I use across the Shrimp Dev ecosystem.</p>
-      <div class="skills-list" style="max-width: 800px;">
+      <div class="skills-list skills-list--wide">
         <span class="skill-tag">Python</span>
         <span class="skill-tag">FastAPI</span>
         <span class="skill-tag">React</span>

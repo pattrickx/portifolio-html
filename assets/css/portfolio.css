@@ -322,6 +322,40 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
 }
 .project-card__link:hover { color: var(--accent); }
 .project-card__link svg { width: 14px; height: 14px; fill: currentColor; }
+.project-card__stack {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* Project card image placeholders (gradient backgrounds) */
+.project-card__img--gradient-orange {
+  background: linear-gradient(135deg, #1e1e26 0%, #ff6b35 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.project-card__img--gradient-dark {
+  background: linear-gradient(135deg, #0d0d0f 0%, #1e1e26 50%, #ff6b35 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.project-card__img--gradient-slate {
+  background: linear-gradient(135deg, #1b1b21 0%, #2a2a35 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.project-card__img-text {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+}
+.project-card__img-text--lg { font-size: 3rem; }
 
 /* ── Side Projects ─────────────────────────────────── */
 .side-projects-note {
@@ -346,8 +380,27 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
 }
 .side-projects-note__text strong { color: var(--text); }
 .side-projects-note__text a { color: var(--accent); text-decoration: underline; }
+.side-projects-note__sub {
+  margin-top: 0.75rem;
+}
 
-/* ── About / Skills ────────────────────────────────── */
+/* ── Utility ───────────────────────────────────────── */
+.about-link {
+  color: var(--accent);
+  transition: color 0.15s;
+}
+.about-link:hover { color: var(--text); text-decoration: underline; }
+
+.skills-heading {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -379,6 +432,8 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
   transition: border-color 0.15s, color 0.15s;
 }
 .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+.section--no-top { padding-top: 0; }
+.skills-list--wide { max-width: 800px; }
 
 /* ── Contact ───────────────────────────────────────── */
 .contact-grid {
