@@ -1,19 +1,10 @@
-name: CI/CD — Portfolio to GitHub Pages
+name: CI/CD — Portfolio Deploy
 
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
   # ═══════════════════════════════════════════════════
@@ -45,44 +36,61 @@ jobs:
           echo ""
           echo "=== All validations passed ==="
 
+      - name: Check project structure
+        run: |
+          test -f index.html && echo "OK: index.html" || (echo "MISSING" && exit 1)
+          test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING" && exit 1)
+          test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING" && exit 1)
+          test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING" && exit 1)
+          echo "OK: all checks passed"
+
   # ═══════════════════════════════════════════════════
-  # Job 2: Build & Deploy to GitHub Pages
+  # Job 2: Deploy to VPS via SSH
   # ═══════════════════════════════════════════════════
   deploy:
-    name: Deploy to GitHub Pages
+    name: Deploy to VPS
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    environment: github-pages
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare site
-        run: |
-          echo "=== Preparing site for GitHub Pages ==="
-          mkdir -p _site
-          cp index.html side-projects.html _site/
-          mkdir -p _site/assets/css
-          cp assets/css/portfolio.css _site/assets/css/
-          mkdir -p _site/images
-          cp -r images/* _site/images/
-          mkdir -p _site/pdfs
-          cp -r pdfs/* _site/pdfs/
-          echo "=== Site ready ==="
-          find _site -type f | sort
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
         with:
-          path: '_site'
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+            DEPLOY_DIR="/var/www/portfolio"
+
+            echo "=== Portfolio Deploy ==="
+            echo "Branch: ${{ github.ref_name }}"
+            echo "Commit: ${{ github.sha }}"
+            echo "Host:   $(hostname)"
+            echo "Date:   $(date)"
+
+            if [ ! -d "$DEPLOY_DIR" ]; then
+              sudo mkdir -p "$DEPLOY_DIR"
+              sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
+              cd "$DEPLOY_DIR"
+              git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" .
+            fi
+
+            cd "$DEPLOY_DIR"
+            git fetch origin
+            git checkout "${{ github.ref_name }}"
+            git pull origin "${{ github.ref_name }}"
+
+            chmod -R 755 .
+
+            if command -v nginx &> /dev/null; then
+              sudo nginx -t && sudo systemctl reload nginx
+            fi
+
+            echo "=== Deploy complete ==="
