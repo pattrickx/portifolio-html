@@ -45,14 +45,92 @@ jobs:
           echo "OK: all checks passed"
 
   # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS via Cloudflare Tunnel
+  # Job 2: Deploy via SSH (IP fixo direto)
   # ═══════════════════════════════════════════════════
   deploy:
-    name: Deploy to VPS
+    name: Deploy via SSH
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    environment:  github-pages
+    environment: .env
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH config
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Deploy to VPS
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+        run: |
+          set -e
+
+          # Normalize host (strip trailing slash and protocol prefixes)
+          HOST=$(echo "$VPS_HOST" | sed -E 's|^(tcp|https?)://||; s|/$||')
+
+          echo "=== Portfolio Deploy ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Host:   $HOST"
+          echo "User:   $VPS_USER"
+          echo "Date:   $(date)"
+          echo ""
+
+          # Create SSH config
+          cat > ~/.ssh/config <<SSHEOF
+          Host portfolio-vps
+            HostName $HOST
+            User $VPS_USER
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+          SSHEOF
+          chmod 600 ~/.ssh/config
+
+          # Create deploy dir if needed
+          echo "[1/3] Preparing VPS..."
+          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio"
+
+          # Sync files
+          echo "[2/3] Syncing files..."
+          rsync -avz --delete \
+            -e "ssh -F ~/.ssh/config" \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='.vscode' \
+            --exclude='.gitignore' \
+            --exclude='deploy.sh' \
+            --exclude='nginx.conf' \
+            --exclude='README.md' \
+            --exclude='node_modules' \
+            ./ "portfolio-vps:/var/www/portfolio/"
+
+          # Reload nginx
+          echo "[3/3] Reloading nginx..."
+          ssh portfolio-vps "chmod -R 755 /var/www/portfolio && sudo nginx -t && sudo systemctl reload nginx" || true
+
+          echo ""
+          echo "=== Deploy complete ==="
+
+  # ═══════════════════════════════════════════════════
+  # Job 3: Deploy via Cloudflare Tunnel (IP dinamico)
+  # ═══════════════════════════════════════════════════
+  deploy-cloudflare:
+    name: Deploy via Cloudflare Tunnel
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    environment: .env
 
     steps:
       - name: Checkout
@@ -81,10 +159,10 @@ jobs:
         run: |
           set -e
 
-          # Strip any protocol prefix from host
-          HOST=$(echo "$VPS_HOST" | sed 's|^tcp//*||' | sed 's|^https*://||' | sed 's|:$||')
+          # Normalize host (strip trailing slash and protocol prefixes)
+          HOST=$(echo "$VPS_HOST" | sed -E 's|^(tcp|https?)://||; s|/$||')
 
-          echo "=== Portfolio Deploy ==="
+          echo "=== Portfolio Deploy (Cloudflare) ==="
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
           echo "Host:   $HOST"
@@ -108,11 +186,12 @@ jobs:
           SSHEOF
           chmod 600 ~/.ssh/config
 
-          # Create deploy directory if needed
-          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio" || true
+          # Create deploy dir
+          echo "[1/3] Preparing VPS..."
+          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio"
 
           # Sync files
-          echo "[1/2] Syncing files..."
+          echo "[2/3] Syncing files..."
           rsync -avz --delete \
             -e "ssh -F ~/.ssh/config" \
             --exclude='.git' \
@@ -125,8 +204,8 @@ jobs:
             --exclude='node_modules' \
             ./ "portfolio-vps:/var/www/portfolio/"
 
-          # Set permissions and reload nginx
-          echo "[2/2] Setting permissions and reloading nginx..."
+          # Reload nginx
+          echo "[3/3] Reloading nginx..."
           ssh portfolio-vps "chmod -R 755 /var/www/portfolio && sudo nginx -t && sudo systemctl reload nginx" || true
 
           echo ""
