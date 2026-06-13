@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d0f"/>
+      <stop offset="100%" style="stop-color:#1e1e26"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="340" fill="url(#bg)"/>
+  <!-- Navbar -->
+  <rect x="0" y="0" width="600" height="48" fill="#141418" stroke="#2a2a35"/>
+  <text x="20" y="30" font-family="sans-serif" font-size="16" font-weight="bold" fill="#e8e6f0">🎬 mediahandler</text>
+  <text x="530" y="30" font-family="sans-serif" font-size="12" fill="#ff6b35">Login</text>
+  <!-- Hero -->
+  <text x="300" y="90" font-family="sans-serif" font-size="28" font-weight="bold" fill="#e8e6f0" text-anchor="middle">mediahandler</text>
+  <text x="300" y="115" font-family="sans-serif" font-size="13" fill="#7a7890" text-anchor="middle">Processamento de Mídia com IA</text>
+  <!-- Feature cards -->
+  <rect x="30" y="140" width="170" height="80" rx="12" fill="#1e1e26" stroke="#2a2a35"/>
+  <text x="50" y="165" font-family="sans-serif" font-size="18" fill="#e8e6f0">✂️</text>
+  <text x="80" y="165" font-family="sans-serif" font-size="12" font-weight="bold" fill="#e8e6f0">Remover Fundo</text>
+  <text x="50" y="190" font-family="sans-serif" font-size="10" fill="#7a7890">Remove o fundo de uma imagem</text>
+  <text x="50" y="205" font-family="sans-serif" font-size="10" fill="#7a7890">retornando PNG transparente</text>
+
+  <rect x="215" y="140" width="170" height="80" rx="12" fill="#1e1e26" stroke="#2a2a35"/>
+  <text x="235" y="165" font-family="sans-serif" font-size="18" fill="#e8e6f0">🖼️</text>
+  <text x="265" y="165" font-family="sans-serif" font-size="12" font-weight="bold" fill="#e8e6f0">Gerar Imagem</text>
+  <text x="235" y="190" font-family="sans-serif" font-size="10" fill="#7a7890">Gera imagem a partir de</text>
+  <text x="235" y="205" font-family="sans-serif" font-size="10" fill="#7a7890">prompt de texto com FLUX</text>
+
+  <rect x="400" y="140" width="170" height="80" rx="12" fill="#1e1e26" stroke="#2a2a35"/>
+  <text x="420" y="165" font-family="sans-serif" font-size="18" fill="#e8e6f0">✨</text>
+  <text x="450" y="165" font-family="sans-serif" font-size="12" font-weight="bold" fill="#e8e6f0">Melhorar Prompt</text>
+  <text x="420" y="190" font-family="sans-serif" font-size="10" fill="#7a7890">Enriquece sua descrição</text>
+  <text x="420" y="205" font-family="sans-serif" font-size="10" fill="#7a7890">para gerar imagens melhores</text>
+
+  <!-- More features row -->
+  <rect x="120" y="240" width="170" height="60" rx="12" fill="#1e1e26" stroke="#2a2a35"/>
+  <text x="140" y="265" font-family="sans-serif" font-size="16" fill="#e8e6f0">👁️</text>
+  <text x="165" y="265" font-family="sans-serif" font-size="11" font-weight="bold" fill="#e8e6f0">Descrever Imagem</text>
+  <text x="140" y="285" font-family="sans-serif" font-size="9" fill="#7a7890">Descrição textual detalhada</text>
+
+  <rect x="310" y="240" width="170" height="60" rx="12" fill="#1e1e26" stroke="#2a2a35"/>
+  <text x="330" y="265" font-family="sans-serif" font-size="16" fill="#e8e6f0">🎵</text>
+  <text x="355" y="265" font-family="sans-serif" font-size="11" font-weight="bold" fill="#e8e6f0">Gerar Áudio</text>
+  <text x="330" y="285" font-family="sans-serif" font-size="9" fill="#7a7890">Áudio a partir de texto</text>
+
+  <!-- Footer -->
+  <text x="300" y="325" font-family="sans-serif" font-size="11" fill="#7a7890" text-anchor="middle">media-handler</text>
+</svg>

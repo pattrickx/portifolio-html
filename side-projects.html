@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Side projects by Patrick Martins — ResumeMatch, Media Handler, and the Multi-Agent MoE System built on Hermes Agent.">
+  <meta name="description" content="Side projects by Patrick Martins — Shrimp Dev Blog, Promo Finder, ResumeMatch, and Media Handler.">
   <meta name="theme-color" content="#0d0d0f">
   <title>Side Projects — Patrick Martins</title>
   <link rel="stylesheet" href="assets/css/portfolio.css">
@@ -52,40 +52,76 @@
   </section>
 
   <!-- ════════════════════════════════════════════
-       MOE SYSTEM NOTE
-       ════════════════════════════════════════════ -->
-  <section class="section section--no-top">
-    <div class="container">
-      <div class="side-projects-note">
-        <span class="side-projects-note__icon">🦐</span>
-        <div class="side-projects-note__text">
-          <p>
-            <strong>These projects are developed with the help of my Multi-Agent MoE System</strong> —
-            an orchestration system of <strong>39 specialized AI agents</strong> (Mixture of Experts)
-            built on top of the <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> framework.
-          </p>
-          <p class="side-projects-note__sub">
-            Each project leverages dedicated agents for <strong>backend development</strong>, <strong>frontend engineering</strong>,
-            <strong>DevOps &amp; infrastructure</strong>, <strong>code review &amp; QA</strong>, <strong>security analysis</strong>,
-            <strong>documentation</strong>, and <strong>architecture design</strong> — organized across 7 specialized layers.
-            The system uses OpenRouter with automatic key rotation across 12 API keys for high availability.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ════════════════════════════════════════════
        SIDE PROJECTS GRID
        ════════════════════════════════════════════ -->
   <section class="section section--no-top">
     <div class="container">
       <div class="projects-grid">
 
+        <!-- Shrimp Dev Blog -->
+        <article class="project-card">
+          <a href="https://blog.shrimpdev.com/" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/blog-shrimpdev.svg" alt="Shrimp Dev Blog" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Blog</span>
+              <span class="project-card__tag">Frontend</span>
+              <span class="project-card__tag">CSS</span>
+              <span class="project-card__tag">Production</span>
+            </div>
+            <h3 class="project-card__title"><a href="https://blog.shrimpdev.com/" target="_blank" rel="noopener">Shrimp Dev Blog</a></h3>
+            <p class="project-card__desc">
+              Technical blog about CSS, React, JavaScript, and modern web standards.
+              Features articles on Container Queries, React 19, TypeScript 5.5, Bun 2.0,
+              Tailwind v4, and more. Built with the Shrimp Dev design system.
+            </p>
+            <p class="project-card__stack">
+              Stack: HTML · CSS · JavaScript · Shrimp Dev Design System
+            </p>
+            <div class="project-card__links">
+              <a href="https://blog.shrimpdev.com/" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Visit Blog
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Promo Miner -->
+        <article class="project-card">
+          <a href="https://promo-miner.shrimpdev.com/" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/promo-miner.svg" alt="Promo Finder Bot" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Bot</span>
+              <span class="project-card__tag">Automation</span>
+              <span class="project-card__tag">Deals</span>
+              <span class="project-card__tag">Production</span>
+            </div>
+            <h3 class="project-card__title"><a href="https://promo-miner.shrimpdev.com/" target="_blank" rel="noopener">Promo Finder Bot</a></h3>
+            <p class="project-card__desc">
+              Automated deal finder for Amazon Brazil. Scrapes and surfaces the best deals
+              with Telegram group integration, real-time statistics, and discount tracking.
+              Helps users save thousands of reais on Amazon purchases.
+            </p>
+            <p class="project-card__stack">
+              Stack: Python · Scraping · Telegram API · Automation
+            </p>
+            <div class="project-card__links">
+              <a href="https://promo-miner.shrimpdev.com/" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Visit Site
+              </a>
+            </div>
+          </div>
+        </article>
+
         <!-- ResumeMatch -->
         <article class="project-card">
           <a href="https://resumematch.shrimpdev.com" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <img src="images/Resume.jpeg" alt="ResumeMatch" class="project-card__img" loading="lazy">
+            <img src="images/resumematch.svg" alt="ResumeMatch" class="project-card__img" loading="lazy">
           </a>
           <div class="project-card__body">
             <div class="project-card__tags">
@@ -98,12 +134,10 @@
             <p class="project-card__desc">
               AI-powered resume vs job matching SaaS. Upload a resume and job description to get
               compatibility scoring, skill gap analysis, salary estimation (3-tier), and improvement
-              suggestions. Features 7 AI agents via OpenRouter, PDF parsing, sanitization with
-              two-tier patterns, and a dark-themed React frontend. Deployed on Oracle VPS via
-              Cloudflare Tunnel.
+              suggestions. Features 7 AI agents via OpenRouter, PDF parsing, and a dark-themed React frontend.
             </p>
             <p class="project-card__stack">
-              Stack: Python · FastAPI · React · Vite · TailwindCSS · Docker Compose · Nginx · Cloudflare Tunnel · OpenRouter
+              Stack: Python · FastAPI · React · Vite · TailwindCSS · Docker · OpenRouter
             </p>
             <div class="project-card__links">
               <a href="https://resumematch.shrimpdev.com" target="_blank" rel="noopener" class="project-card__link">
@@ -117,127 +151,28 @@
         <!-- Media Handler -->
         <article class="project-card">
           <a href="https://mediahandler.shrimpdev.com" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img project-card__img--gradient-orange">
-              <span class="project-card__img-text">MH</span>
-            </div>
+            <img src="images/mediahandler.svg" alt="Media Handler" class="project-card__img" loading="lazy">
           </a>
           <div class="project-card__body">
             <div class="project-card__tags">
               <span class="project-card__tag">SaaS</span>
-              <span class="project-card__tag">Media</span>
+              <span class="project-card__tag">AI</span>
               <span class="project-card__tag">Full-Stack</span>
               <span class="project-card__tag">Production</span>
             </div>
             <h3 class="project-card__title"><a href="https://mediahandler.shrimpdev.com" target="_blank" rel="noopener">Media Handler</a></h3>
             <p class="project-card__desc">
-              Media processing and management platform. Handles image, audio, and video processing
-              with AI-powered features. Built with modern web technologies and deployed on Oracle
-              VPS infrastructure with Cloudflare Tunnel for secure access.
+              AI-powered media processing platform. Features background removal, image generation
+              with FLUX, prompt enhancement, image description, audio generation, and video generation.
+              Login-protected features with JWT authentication.
             </p>
             <p class="project-card__stack">
-              Stack: Python · FastAPI · React · Docker · Cloudflare Tunnel
+              Stack: Python · FastAPI · React · Docker · AI Models (FLUX, Kokoro, Grok)
             </p>
             <div class="project-card__links">
               <a href="https://mediahandler.shrimpdev.com" target="_blank" rel="noopener" class="project-card__link">
                 <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
                 Live Demo
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Multi-Agent MoE System -->
-        <article class="project-card">
-          <a href="https://github.com/pattrickx" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img project-card__img--gradient-dark">
-              <span class="project-card__img-text project-card__img-text--lg">🎼</span>
-            </div>
-          </a>
-          <div class="project-card__body">
-            <div class="project-card__tags">
-              <span class="project-card__tag">AI</span>
-              <span class="project-card__tag">Multi-Agent</span>
-              <span class="project-card__tag">MoE</span>
-              <span class="project-card__tag">Open Source</span>
-            </div>
-            <h3 class="project-card__title"><a href="https://github.com/pattrickx" target="_blank" rel="noopener">Multi-Agent MoE System</a></h3>
-            <p class="project-card__desc">
-              A multi-agent orchestration system with <strong>39 specialized AI agents</strong> organized
-              in 7 layers: Orchestration, Product/Design, Development, Quality, Infrastructure,
-              IA/Dados, and Docs/Observability. Built on top of the Hermes Agent framework with
-              MoE (Mixture of Experts) scoring for intelligent task routing. Features automatic
-              OpenRouter key rotation across 12 API keys.
-            </p>
-            <p class="project-card__stack">
-              Stack: Hermes Agent · OpenRouter · Python · 39 Agent Profiles · MoE Scoring
-            </p>
-            <div class="project-card__links">
-              <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener" class="project-card__link">
-                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
-                Hermes Agent
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- Data Analysis Protocol -->
-        <article class="project-card">
-          <a href="https://github.com/pattrickx/data-analysis-and-ML-protocol" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <img src="images/flow.png" alt="Data Analysis Protocol" class="project-card__img" loading="lazy">
-          </a>
-          <div class="project-card__body">
-            <div class="project-card__tags">
-              <span class="project-card__tag">Python</span>
-              <span class="project-card__tag">Protocol</span>
-              <span class="project-card__tag">Open Source</span>
-              <span class="project-card__tag">ML</span>
-            </div>
-            <h3 class="project-card__title"><a href="https://github.com/pattrickx/data-analysis-and-ML-protocol" target="_blank" rel="noopener">Data Analysis Protocol</a></h3>
-            <p class="project-card__desc">
-              A comprehensive step-by-step protocol for data analysis in Python. Covers pandas,
-              numpy, scikit-learn, imbalanced-learn, SHAP, and matplotlib/seaborn. Includes
-              code examples in Markdown with equivalent scripts for reproducible workflows.
-            </p>
-            <p class="project-card__stack">
-              Stack: Python · pandas · scikit-learn · SHAP · matplotlib
-            </p>
-            <div class="project-card__links">
-              <a href="https://github.com/pattrickx/data-analysis-and-ML-protocol" target="_blank" rel="noopener" class="project-card__link">
-                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
-                GitHub
-              </a>
-            </div>
-          </div>
-        </article>
-
-        <!-- General Utils -->
-        <article class="project-card">
-          <a href="https://github.com/pattrickx" target="_blank" rel="noopener" class="project-card__img-wrap">
-            <div class="project-card__img project-card__img--gradient-slate">
-              <span class="project-card__img-text project-card__img-text--lg">🛠️</span>
-            </div>
-          </a>
-          <div class="project-card__body">
-            <div class="project-card__tags">
-              <span class="project-card__tag">Utils</span>
-              <span class="project-card__tag">Design System</span>
-              <span class="project-card__tag">DevOps</span>
-              <span class="project-card__tag">Open Source</span>
-            </div>
-            <h3 class="project-card__title"><a href="https://github.com/pattrickx" target="_blank" rel="noopener">General Utils &amp; Design System</a></h3>
-            <p class="project-card__desc">
-              A centralized repository of reusable utilities, protocols, and design assets. Includes
-              the Shrimp Dev Design System (CSS, HTML, brand identity), Python utilities (API key
-              rotation, input sanitization), infrastructure templates (Docker, CI/CD, Nginx), and
-              agent protocols for AI-assisted development.
-            </p>
-            <p class="project-card__stack">
-              Stack: Python · CSS · Docker · GitHub Actions · Nginx · Protocols
-            </p>
-            <div class="project-card__links">
-              <a href="https://github.com/pattrickx" target="_blank" rel="noopener" class="project-card__link">
-                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
-                GitHub
               </a>
             </div>
           </div>
@@ -292,6 +227,7 @@
       <div class="footer__links">
         <a href="https://resumematch.shrimpdev.com" class="footer__link" target="_blank" rel="noopener">ResumeMatch</a>
         <a href="https://mediahandler.shrimpdev.com" class="footer__link" target="_blank" rel="noopener">Media Handler</a>
+        <a href="https://blog.shrimpdev.com" class="footer__link" target="_blank" rel="noopener">Blog</a>
         <a href="index.html" class="footer__link">Portfolio</a>
       </div>
     </div>

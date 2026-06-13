@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 340">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d0d0f"/>
+      <stop offset="100%" style="stop-color:#1e1e26"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="340" fill="url(#bg)"/>
+  <!-- Navbar -->
+  <rect x="0" y="0" width="600" height="48" fill="#141418"/>
+  <text x="20" y="30" font-family="sans-serif" font-size="16" font-weight="bold" fill="#e8e6f0">R</text>
+  <text x="38" y="30" font-family="sans-serif" font-size="16" font-weight="bold" fill="#ff6b35">Resume</text>
+  <text x="100" y="30" font-family="sans-serif" font-size="16" font-weight="bold" fill="#e8e6f0">Match</text>
+  <text x="520" y="30" font-family="sans-serif" font-size="12" fill="#7a7890">GitHub</text>
+  <text x="560" y="30" font-family="sans-serif" font-size="12" fill="#7a7890">API</text>
+  <!-- Hero -->
+  <text x="300" y="110" font-family="sans-serif" font-size="28" font-weight="bold" fill="#e8e6f0" text-anchor="middle">ResumeMatch</text>
+  <text x="300" y="140" font-family="sans-serif" font-size="13" fill="#7a7890" text-anchor="middle">IA Multiagente para Compatibilidade</text>
+  <text x="300" y="158" font-family="sans-serif" font-size="13" fill="#7a7890" text-anchor="middle">Currículo × Vaga</text>
+  <!-- Form fields -->
+  <rect x="100" y="180" width="400" height="36" rx="8" fill="#1b1b21" stroke="#2a2a35"/>
+  <text x="115" y="203" font-family="sans-serif" font-size="11" fill="#7a7890">Cole o texto do currículo...</text>
+  <rect x="100" y="226" width="400" height="36" rx="8" fill="#1b1b21" stroke="#2a2a35"/>
+  <text x="115" y="249" font-family="sans-serif" font-size="11" fill="#7a7890">Cole a descrição da vaga...</text>
+  <rect x="100" y="272" width="400" height="36" rx="8" fill="#1b1b21" stroke="#2a2a35"/>
+  <text x="115" y="295" font-family="sans-serif" font-size="11" fill="#7a7890">Ou cole a URL da vaga</text>
+  <!-- Button -->
+  <rect x="220" y="318" width="160" height="32" rx="8" fill="#ff6b35"/>
+  <text x="300" y="338" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff" text-anchor="middle">Analisar</text>
+</svg>
