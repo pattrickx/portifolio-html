@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, master]
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/portfolio
+
 jobs:
   # ═══════════════════════════════════════════════════
   # Job 1: Validate
@@ -41,15 +45,55 @@ jobs:
           test -f index.html && echo "OK: index.html" || (echo "MISSING" && exit 1)
           test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING" && exit 1)
           test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING" && exit 1)
-          test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING" && exit 1)
+          test -f Dockerfile && echo "OK: Dockerfile" || (echo "MISSING" && exit 1)
+          test -f docker-compose.yml && echo "OK: docker-compose.yml" || (echo "MISSING" && exit 1)
+          test -f nginx.conf && echo "OK: nginx.conf" || (echo "MISSING" && exit 1)
           echo "OK: all checks passed"
 
   # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS via Cloudflare Tunnel
+  # Job 2: Build & Push Docker Image
+  # ═══════════════════════════════════════════════════
+  build:
+    name: Build & Push Docker Image
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ═══════════════════════════════════════════════════
+  # Job 3: Deploy to VPS via Cloudflare Tunnel
   # ═══════════════════════════════════════════════════
   deploy:
     name: Deploy to VPS
-    needs: validate
+    needs: build
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     environment: github-pages
@@ -64,17 +108,23 @@ jobs:
             -o /usr/local/bin/cloudflared
           chmod +x /usr/local/bin/cloudflared
 
-      - name: Setup SSH and deploy
+      - name: Deploy to VPS
         env:
           VPS_HOST_RAW: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
           CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          REGISTRY: ${{ env.REGISTRY }}
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN_VALUE: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
         run: |
           set -e
 
-          # Normalize host: strip protocol prefixes and trailing slashes
+          # Normalize host
           HOST="$VPS_HOST_RAW"
           HOST="${HOST#tcp://}"
           HOST="${HOST#https://}"
@@ -82,10 +132,10 @@ jobs:
           HOST="${HOST%%/}"
 
           echo "=== Portfolio Deploy ==="
-          echo "Branch: ${{ github.ref_name }}"
+          echo "Branch: $GITHUB_REF_NAME"
           echo "Commit: ${{ github.sha }}"
           echo "Host:   $HOST"
-          echo "User:   $VPS_USER"
+          echo "Image:  ${REGISTRY}/${IMAGE_NAME}:latest"
           echo "Date:   $(date)"
           echo ""
 
@@ -95,41 +145,62 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
 
           # Write SSH config with Cloudflare Tunnel proxy
-          # IMPORTANT: closing SSHEOF must be at column 0
           cat > ~/.ssh/config << SSHEOF
-Host portfolio-vps
-  HostName $HOST
-  User $VPS_USER
-  ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
-  IdentityFile ~/.ssh/deploy_key
-  StrictHostKeyChecking no
-  UserKnownHostsFile /dev/null
-  ServerAliveInterval 60
-  ServerAliveCountMax 10
-SSHEOF
+          Host portfolio-vps
+            HostName $HOST
+            User $VPS_USER
+            ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+          SSHEOF
           chmod 600 ~/.ssh/config
 
-          # Create deploy dir if needed
-          echo "[1/3] Preparing VPS..."
-          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio"
+          # Deploy via SSH
+          ssh portfolio-vps \
+            "REGISTRY=${REGISTRY}" \
+            "IMAGE_NAME=${IMAGE_NAME}" \
+            "GITHUB_ACTOR=${GITHUB_ACTOR}" \
+            "GITHUB_TOKEN_VALUE=${GITHUB_TOKEN_VALUE}" \
+            "GITHUB_REPOSITORY=${GITHUB_REPOSITORY}" \
+            "GITHUB_REF_NAME=${GITHUB_REF_NAME}" \
+            "GITHUB_SHA=${{ github.sha }}" \
+            bash -s <<'ENDSSH'
+              set -e
 
-          # Sync files
-          echo "[2/3] Syncing files..."
-          rsync -avz --delete \
-            -e "ssh -F ~/.ssh/config" \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.vscode' \
-            --exclude='.gitignore' \
-            --exclude='deploy.sh' \
-            --exclude='nginx.conf' \
-            --exclude='README.md' \
-            --exclude='node_modules' \
-            ./ "portfolio-vps:/var/www/portfolio/"
+              DEPLOY_DIR="/opt/portfolio"
 
-          # Reload nginx
-          echo "[3/3] Reloading nginx..."
-          ssh portfolio-vps "chmod -R 755 /var/www/portfolio && sudo nginx -t && sudo systemctl reload nginx" || true
+              echo "Host:   $(hostname)"
+              echo "Dir:    $DEPLOY_DIR"
 
-          echo ""
-          echo "=== Deploy complete ==="
+              # Create deploy dir
+              sudo mkdir -p "$DEPLOY_DIR"
+              sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
+
+              # Clone repo if first deploy
+              if [ ! -d "$DEPLOY_DIR/.git" ]; then
+                cd "$DEPLOY_DIR"
+                git clone "https://x-access-token:${GITHUB_TOKEN_VALUE}@github.com/${GITHUB_REPOSITORY}.git" .
+              fi
+
+              cd "$DEPLOY_DIR"
+              git fetch origin
+              git checkout "$GITHUB_REF_NAME"
+              git pull origin "$GITHUB_REF_NAME"
+
+              # Login to GHCR
+              echo "$GITHUB_TOKEN_VALUE" | docker login "$REGISTRY" -u "$GITHUB_ACTOR" --password-stdin
+
+              # Pull latest image and restart
+              docker compose pull
+              docker compose up -d --remove-orphans
+
+              # Cleanup old images
+              docker image prune -af --filter "until=168h" || true
+
+              echo ""
+              echo "=== Deploy complete ==="
+              docker compose ps
+          ENDSSH
