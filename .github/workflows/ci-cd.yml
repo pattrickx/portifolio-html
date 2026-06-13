@@ -6,12 +6,9 @@ on:
   pull_request:
     branches: [main, master]
 
-env:
-  DEPLOY_DIR: /var/www/portfolio
-
 jobs:
   # ═══════════════════════════════════════════════════
-  # Job 1: Validate HTML & CSS
+  # Job 1: Validate
   # ═══════════════════════════════════════════════════
   validate:
     name: Validate HTML & CSS
@@ -21,14 +18,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate HTML
-        uses: Cyb3r-Jak3/html5validator-action@v7
+      - name: Validate HTML5
+        uses: actions/setup-node@v4
         with:
-          root: .
-          css: true
-          format: json
+          node-version: '20'
 
-      - name: Check file structure
+      - name: Install html-validate
+        run: npm install -g html-validate
+
+      - name: Validate HTML files
+        run: |
+          echo "=== Validating index.html ==="
+          html-validate index.html
+          echo ""
+          echo "=== Validating side-projects.html ==="
+          html-validate side-projects.html
+          echo ""
+          echo "=== Validation passed ==="
+
+      - name: Check project structure
         run: |
           echo "=== Checking required files ==="
           test -f index.html && echo "OK: index.html" || (echo "MISSING: index.html" && exit 1)
@@ -37,7 +45,7 @@ jobs:
           test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING: .gitignore" && exit 1)
           echo ""
           echo "=== Project structure ==="
-          find . -not -path './.git/*' -not -path './.git' -not -path './.github/*' -not -path './.vscode/*' | sort
+          find . -not -path './.git/*' -not -path './.git' -not -path './.github/*' -not -path './.vscode/*' -not -path './node_modules/*' | sort
 
   # ═══════════════════════════════════════════════════
   # Job 2: Deploy to VPS via SSH
@@ -82,7 +90,7 @@ jobs:
           echo ""
 
           # Create deploy directory if needed
-          ssh "${VPS_USER}@${VPS_HOST}" "sudo mkdir -p ${DEPLOY_DIR} && sudo chown ${VPS_USER}:${VPS_USER} ${DEPLOY_DIR}"
+          ssh "${VPS_USER}@${VPS_HOST}" "sudo mkdir -p /var/www/portfolio && sudo chown ${VPS_USER}:${VPS_USER} /var/www/portfolio"
 
           # Sync files via rsync
           echo "[1/3] Syncing files to VPS..."
@@ -95,84 +103,16 @@ jobs:
             --exclude='deploy.sh' \
             --exclude='nginx.conf' \
             --exclude='README.md' \
-            ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_DIR}/"
+            --exclude='node_modules' \
+            ./ "${VPS_USER}@${VPS_HOST}:/var/www/portfolio/"
 
           # Set permissions
           echo "[2/3] Setting permissions..."
-          ssh "${VPS_USER}@${VPS_HOST}" "chmod -R 755 ${DEPLOY_DIR}"
+          ssh "${VPS_USER}@${VPS_HOST}" "chmod -R 755 /var/www/portfolio"
 
           # Reload nginx
           echo "[3/3] Reloading Nginx..."
           ssh "${VPS_USER}@${VPS_HOST}" "sudo nginx -t && sudo systemctl reload nginx"
 
           echo ""
-          echo "=== Deploy complete ==="
-          echo "Site: https://${{ secrets.VPS_DOMAIN }}"
-
-  # ═══════════════════════════════════════════════════
-  # Job 3: Deploy via Cloudflare Tunnel (alternative)
-  # ═══════════════════════════════════════════════════
-  deploy-cloudflare:
-    name: Deploy via Cloudflare Tunnel
-    needs: validate
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    # Only use this if VPS has no fixed IP and uses Cloudflare Tunnel for SSH
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install cloudflared
-        run: |
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
-            -o /usr/local/bin/cloudflared
-          chmod +x /usr/local/bin/cloudflared
-
-      - name: Deploy via Cloudflare Tunnel
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-        run: |
-          set -e
-
-          mkdir -p ~/.ssh
-          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-          cat > ~/.ssh/config <<EOF
-          Host ${VPS_HOST}
-            ProxyCommand cloudflared access ssh --hostname %h \
-              --service-token-id ${CF_ACCESS_CLIENT_ID} \
-              --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-            ServerAliveInterval 60
-            ServerAliveCountMax 10
-          EOF
-          chmod 600 ~/.ssh/config
-
-          echo "=== Portfolio Deploy (Cloudflare Tunnel) ==="
-
-          # Create deploy directory
-          ssh "${VPS_USER}@${VPS_HOST}" "sudo mkdir -p ${DEPLOY_DIR} && sudo chown ${VPS_USER}:${VPS_USER} ${DEPLOY_DIR}"
-
-          # Sync files
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o ProxyCommand='cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}'" \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.vscode' \
-            --exclude='.gitignore' \
-            --exclude='deploy.sh' \
-            --exclude='nginx.conf' \
-            --exclude='README.md' \
-            ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_DIR}/"
-
-          ssh "${VPS_USER}@${VPS_HOST}" "chmod -R 755 ${DEPLOY_DIR} && sudo nginx -t && sudo systemctl reload nginx"
-
           echo "=== Deploy complete ==="
