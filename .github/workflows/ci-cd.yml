@@ -95,19 +95,18 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
 
           # Write SSH config with Cloudflare Tunnel proxy
-          cat > ~/.ssh/config <<SSHEOF
-          Host portfolio-vps
-            HostName $HOST
-            User $VPS_USER
-            ProxyCommand cloudflared access ssh --hostname %h \
-              --service-token-id ${CF_ACCESS_CLIENT_ID} \
-              --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-            ServerAliveInterval 60
-            ServerAliveCountMax 10
-          SSHEOF
+          # IMPORTANT: closing SSHEOF must be at column 0
+          cat > ~/.ssh/config << SSHEOF
+Host portfolio-vps
+  HostName $HOST
+  User $VPS_USER
+  ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
+  IdentityFile ~/.ssh/deploy_key
+  StrictHostKeyChecking no
+  UserKnownHostsFile /dev/null
+  ServerAliveInterval 60
+  ServerAliveCountMax 10
+SSHEOF
           chmod 600 ~/.ssh/config
 
           # Create deploy dir if needed
