@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate HTML5
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
@@ -50,23 +50,93 @@ jobs:
   # ═══════════════════════════════════════════════════
   # Job 2: Deploy to VPS via SSH
   # ═══════════════════════════════════════════════════
-  deploy:
-    name: Deploy to VPS
+  deploy-ssh:
+    name: Deploy via SSH
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    environment: .env
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup SSH key
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            DEPLOY_DIR="/var/www/portfolio"
+
+            echo "=== Portfolio Deploy (SSH) ==="
+            echo "Branch: ${{ github.ref_name }}"
+            echo "Commit: ${{ github.sha }}"
+            echo "Host:   $(hostname)"
+            echo "Date:   $(date)"
+
+            if [ ! -d "$DEPLOY_DIR" ]; then
+              sudo mkdir -p "$DEPLOY_DIR"
+              sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
+              cd "$DEPLOY_DIR"
+              git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" .
+            fi
+
+            cd "$DEPLOY_DIR"
+            git fetch origin
+            git checkout "${{ github.ref_name }}"
+            git pull origin "${{ github.ref_name }}"
+
+            chmod -R 755 .
+
+            if command -v nginx &> /dev/null; then
+              sudo nginx -t && sudo systemctl reload nginx
+            fi
+
+            echo "=== Deploy complete ==="
+
+  # ═══════════════════════════════════════════════════
+  # Job 3: Deploy via Cloudflare Tunnel (VPS com IP dinamico)
+  # ═══════════════════════════════════════════════════
+  deploy-cloudflare:
+    name: Deploy via Cloudflare Tunnel
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    environment: .env
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install cloudflared
         run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
+      - name: Deploy via Cloudflare Tunnel
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+        run: |
+          set -e
+
           mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
+
           cat > ~/.ssh/config <<EOF
-          Host ${{ secrets.VPS_HOST }}
+          Host ${VPS_HOST}
+            ProxyCommand cloudflared access ssh --hostname %h \
+              --service-token-id ${CF_ACCESS_CLIENT_ID} \
+              --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
@@ -75,44 +145,40 @@ jobs:
           EOF
           chmod 600 ~/.ssh/config
 
-      - name: Deploy to VPS
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-        run: |
-          set -e
-
-          echo "=== Portfolio Deploy ==="
+          echo "=== Portfolio Deploy (Cloudflare Tunnel) ==="
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
           echo "Host:   ${VPS_HOST}"
           echo "Date:   $(date)"
-          echo ""
 
-          # Create deploy directory if needed
-          ssh "${VPS_USER}@${VPS_HOST}" "sudo mkdir -p /var/www/portfolio && sudo chown ${VPS_USER}:${VPS_USER} /var/www/portfolio"
+          ssh "${VPS_USER}@${VPS_HOST}" \
+            DEPLOY_DIR="/var/www/portfolio" \
+            GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
+            GITHUB_REPO="${{ github.repository }}" \
+            GITHUB_REF="${{ github.ref_name }}" \
+            bash -s <<'ENDSSH'
+              set -e
 
-          # Sync files via rsync
-          echo "[1/3] Syncing files to VPS..."
-          rsync -avz --delete \
-            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='.vscode' \
-            --exclude='.gitignore' \
-            --exclude='deploy.sh' \
-            --exclude='nginx.conf' \
-            --exclude='README.md' \
-            --exclude='node_modules' \
-            ./ "${VPS_USER}@${VPS_HOST}:/var/www/portfolio/"
+              echo "Host:   $(hostname)"
+              echo "Dir:    $DEPLOY_DIR"
 
-          # Set permissions
-          echo "[2/3] Setting permissions..."
-          ssh "${VPS_USER}@${VPS_HOST}" "chmod -R 755 /var/www/portfolio"
+              if [ ! -d "$DEPLOY_DIR" ]; then
+                sudo mkdir -p "$DEPLOY_DIR"
+                sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
+                cd "$DEPLOY_DIR"
+                git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git" .
+              fi
 
-          # Reload nginx
-          echo "[3/3] Reloading Nginx..."
-          ssh "${VPS_USER}@${VPS_HOST}" "sudo nginx -t && sudo systemctl reload nginx"
+              cd "$DEPLOY_DIR"
+              git fetch origin
+              git checkout "$GITHUB_REF"
+              git pull origin "$GITHUB_REF}"
 
-          echo ""
-          echo "=== Deploy complete ==="
+              chmod -R 755 .
+
+              if command -v nginx &> /dev/null; then
+                sudo nginx -t && sudo systemctl reload nginx
+              fi
+
+              echo "=== Deploy complete ==="
+          ENDSSH
