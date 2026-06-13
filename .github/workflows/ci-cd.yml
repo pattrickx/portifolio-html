@@ -4,6 +4,7 @@ on:
   push:
     branches: [main, master]
   pull_request:
+
     branches: [main, master]
 
 jobs:
@@ -34,24 +35,23 @@ jobs:
           echo "=== Validating side-projects.html ==="
           html-validate side-projects.html
           echo ""
-          echo "=== Validation passed ==="
+          echo "=== All validations passed ==="
 
       - name: Check project structure
         run: |
-          echo "=== Checking required files ==="
+          echo "=== Required files ==="
           test -f index.html && echo "OK: index.html" || (echo "MISSING: index.html" && exit 1)
           test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING: side-projects.html" && exit 1)
           test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING: portfolio.css" && exit 1)
           test -f .gitignore && echo "OK: .gitignore" || (echo "MISSING: .gitignore" && exit 1)
           echo ""
-          echo "=== Project structure ==="
-          find . -not -path './.git/*' -not -path './.git' -not -path './.github/*' -not -path './.vscode/*' -not -path './node_modules/*' | sort
+          echo "OK: all checks passed"
 
   # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS via SSH
+  # Job 2: Deploy to VPS
   # ═══════════════════════════════════════════════════
-  deploy-ssh:
-    name: Deploy via SSH
+  deploy:
+    name: Deploy to VPS
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
@@ -72,7 +72,7 @@ jobs:
 
             DEPLOY_DIR="/var/www/portfolio"
 
-            echo "=== Portfolio Deploy (SSH) ==="
+            echo "=== Portfolio Deploy ==="
             echo "Branch: ${{ github.ref_name }}"
             echo "Commit: ${{ github.sha }}"
             echo "Host:   $(hostname)"
@@ -97,88 +97,3 @@ jobs:
             fi
 
             echo "=== Deploy complete ==="
-
-  # ═══════════════════════════════════════════════════
-  # Job 3: Deploy via Cloudflare Tunnel (VPS com IP dinamico)
-  # ═══════════════════════════════════════════════════
-  deploy-cloudflare:
-    name: Deploy via Cloudflare Tunnel
-    needs: validate
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-    environment: .env
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install cloudflared
-        run: |
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
-            -o /usr/local/bin/cloudflared
-          chmod +x /usr/local/bin/cloudflared
-
-      - name: Deploy via Cloudflare Tunnel
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
-          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
-        run: |
-          set -e
-
-          mkdir -p ~/.ssh
-          echo "$VPS_SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-
-          cat > ~/.ssh/config <<EOF
-          Host ${VPS_HOST}
-            ProxyCommand cloudflared access ssh --hostname %h \
-              --service-token-id ${CF_ACCESS_CLIENT_ID} \
-              --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
-            IdentityFile ~/.ssh/deploy_key
-            StrictHostKeyChecking no
-            UserKnownHostsFile /dev/null
-            ServerAliveInterval 60
-            ServerAliveCountMax 10
-          EOF
-          chmod 600 ~/.ssh/config
-
-          echo "=== Portfolio Deploy (Cloudflare Tunnel) ==="
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Host:   ${VPS_HOST}"
-          echo "Date:   $(date)"
-
-          ssh "${VPS_USER}@${VPS_HOST}" \
-            DEPLOY_DIR="/var/www/portfolio" \
-            GITHUB_TOKEN="${{ secrets.GITHUB_TOKEN }}" \
-            GITHUB_REPO="${{ github.repository }}" \
-            GITHUB_REF="${{ github.ref_name }}" \
-            bash -s <<'ENDSSH'
-              set -e
-
-              echo "Host:   $(hostname)"
-              echo "Dir:    $DEPLOY_DIR"
-
-              if [ ! -d "$DEPLOY_DIR" ]; then
-                sudo mkdir -p "$DEPLOY_DIR"
-                sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
-                cd "$DEPLOY_DIR"
-                git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPO}.git" .
-              fi
-
-              cd "$DEPLOY_DIR"
-              git fetch origin
-              git checkout "$GITHUB_REF"
-              git pull origin "$GITHUB_REF}"
-
-              chmod -R 755 .
-
-              if command -v nginx &> /dev/null; then
-                sudo nginx -t && sudo systemctl reload nginx
-              fi
-
-              echo "=== Deploy complete ==="
-          ENDSSH
