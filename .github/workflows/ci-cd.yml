@@ -68,7 +68,11 @@ jobs:
           set -e
 
           # Normalize host: strip protocol prefixes and trailing slashes
-          HOST=$(echo "$VPS_HOST_RAW" | sed -E 's|^(tcp|https?)://||; s|/+$||')
+          HOST="$VPS_HOST_RAW"
+          HOST="${HOST#tcp://}"
+          HOST="${HOST#https://}"
+          HOST="${HOST#http://}"
+          HOST="${HOST%%/}"
 
           echo "=== Portfolio Deploy ==="
           echo "Branch: ${{ github.ref_name }}"
