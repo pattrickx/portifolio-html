@@ -58,13 +58,19 @@ jobs:
         run: |
           set -e
 
-          # Normalize host: strip protocol prefixes and trailing slashes
-          HOST=$(printf '%s' "$VPS_HOST_RAW" | sed 's|^tcp://||; s|^https://||; s|^http://||; s|/+$||')
+          # Normalize host: remove everything up to :// and all trailing slashes
+          HOST="$VPS_HOST_RAW"
+          # Remove protocol prefix (everything before and including ://)
+          if [[ "$HOST" == *://* ]]; then
+            HOST="${HOST##*://}"
+          fi
+          # Remove ALL trailing slashes
+          HOST="${HOST%%[!/]}"
 
           echo "=== Portfolio Deploy ==="
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
-          echo "Host:   $HOST"
+          echo "Host:   [$HOST]"
           echo "User:   $VPS_USER"
           echo "Date:   $(date)"
           echo ""
