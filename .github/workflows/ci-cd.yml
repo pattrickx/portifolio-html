@@ -37,7 +37,7 @@ jobs:
           echo "=== All validations passed ==="
 
   # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS via SSH
+  # Job 2: Deploy to VPS via Cloudflare Tunnel
   # ═══════════════════════════════════════════════════
   deploy:
     name: Deploy to VPS
@@ -50,21 +50,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install cloudflared
+        run: |
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
+            -o /usr/local/bin/cloudflared
+          chmod +x /usr/local/bin/cloudflared
+
       - name: Setup SSH and deploy
         env:
           VPS_HOST_RAW: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           set -e
 
           # Normalize host
           HOST="$VPS_HOST_RAW"
-          # Remove protocol prefix
           if [[ "$HOST" == *://* ]]; then
             HOST="${HOST##*://}"
           fi
-          # Remove trailing slashes one by one
           while [[ "$HOST" == */ ]]; do
             HOST="${HOST%/}"
           done
@@ -82,11 +88,12 @@ jobs:
           printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
 
-          # Write SSH config
+          # Write SSH config with Cloudflare Tunnel proxy
           cat > ~/.ssh/config <<SSHEOF
           Host portfolio-vps
             HostName $HOST
             User $VPS_USER
+            ProxyCommand cloudflared access ssh --hostname %h --service-token-id ${CF_ACCESS_CLIENT_ID} --service-token-secret ${CF_ACCESS_CLIENT_SECRET}
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
