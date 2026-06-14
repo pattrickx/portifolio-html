@@ -7,55 +7,37 @@ on:
     branches: [main, master]
 
 jobs:
-  # ═══════════════════════════════════════════════════
-  # Job 1: Validate
-  # ═══════════════════════════════════════════════════
   validate:
     name: Validate HTML & CSS
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install html-validate
         run: npm install -g html-validate
-
       - name: Validate HTML files
         run: |
-          echo "=== Validating index.html ==="
           html-validate index.html
-          echo ""
-          echo "=== Validating side-projects.html ==="
           html-validate side-projects.html
-          echo ""
-          echo "=== All validations passed ==="
+          echo "All validations passed"
 
-  # ═══════════════════════════════════════════════════
-  # Job 2: Deploy to VPS via Cloudflare Tunnel
-  # ═══════════════════════════════════════════════════
   deploy:
     name: Deploy to VPS
     needs: validate
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
     environment: github-pages
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install cloudflared
         run: |
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 \
-            -o /usr/local/bin/cloudflared
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o /usr/local/bin/cloudflared
           chmod +x /usr/local/bin/cloudflared
-
       - name: Setup SSH and deploy
         env:
           VPS_HOST_RAW: ${{ secrets.VPS_HOST }}
@@ -65,30 +47,12 @@ jobs:
           CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
         run: |
           set -e
-
-          # Normalize host
           HOST="$VPS_HOST_RAW"
-          if [[ "$HOST" == *://* ]]; then
-            HOST="${HOST##*://}"
-          fi
-          while [[ "$HOST" == */ ]]; do
-            HOST="${HOST%/}"
-          done
-
-          echo "=== Portfolio Deploy ==="
-          echo "Branch: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Host:   [$HOST]"
-          echo "User:   $VPS_USER"
-          echo "Date:   $(date)"
-          echo ""
-
-          # Write SSH key
+          if [[ "$HOST" == *://* ]]; then HOST="${HOST##*://}"; fi
+          while [[ "$HOST" == */ ]]; do HOST="${HOST%/}"; done
           mkdir -p ~/.ssh
           printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-
-          # Write SSH config with Cloudflare Tunnel proxy
           cat > ~/.ssh/config <<SSHEOF
           Host portfolio-vps
             HostName $HOST
@@ -97,22 +61,8 @@ jobs:
             IdentityFile ~/.ssh/deploy_key
             StrictHostKeyChecking no
             UserKnownHostsFile /dev/null
-            ServerAliveInterval 60
-            ServerAliveCountMax 10
           SSHEOF
           chmod 600 ~/.ssh/config
-
-          # Create deploy dir
-          echo "[1/3] Preparing VPS..."
           ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio"
-
-          # Clone or update repo
-          echo "[2/3] Deploying code..."
           ssh portfolio-vps "if [ ! -d /var/www/portfolio/.git ]; then cd /var/www/portfolio && git clone https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git .; fi && cd /var/www/portfolio && git fetch origin && git checkout ${GITHUB_REF_NAME} && git pull origin ${GITHUB_REF_NAME} && chmod -R 755 ."
-
-          # Reload nginx
-          echo "[3/3] Reloading nginx..."
           ssh portfolio-vps "command -v nginx &> /dev/null && sudo nginx -t && sudo systemctl reload nginx || true"
-
-          echo ""
-          echo "=== Deploy complete ==="
