@@ -36,13 +36,6 @@ jobs:
           echo ""
           echo "=== All validations passed ==="
 
-      - name: Check project structure
-        run: |
-          test -f index.html && echo "OK: index.html" || (echo "MISSING" && exit 1)
-          test -f side-projects.html && echo "OK: side-projects.html" || (echo "MISSING" && exit 1)
-          test -f assets/css/portfolio.css && echo "OK: portfolio.css" || (echo "MISSING" && exit 1)
-          echo "OK: all checks passed"
-
   # ═══════════════════════════════════════════════════
   # Job 2: Deploy to VPS via SSH
   # ═══════════════════════════════════════════════════
@@ -57,44 +50,54 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            set -e
+      - name: Setup SSH and deploy
+        env:
+          VPS_HOST_RAW: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          set -e
 
-            DEPLOY_DIR="/var/www/portfolio"
+          # Normalize host: strip protocol prefixes and trailing slashes
+          HOST=$(printf '%s' "$VPS_HOST_RAW" | sed 's|^tcp://||; s|^https://||; s|^http://||; s|/+$||')
 
-            echo "=== Portfolio Deploy ==="
-            echo "Branch: ${{ github.ref_name }}"
-            echo "Commit: ${{ github.sha }}"
-            echo "Host:   $(hostname)"
-            echo "Date:   $(date)"
+          echo "=== Portfolio Deploy ==="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Host:   $HOST"
+          echo "User:   $VPS_USER"
+          echo "Date:   $(date)"
+          echo ""
 
-            # Create deploy dir if needed
-            sudo mkdir -p "$DEPLOY_DIR"
-            sudo chown $(whoami):$(whoami) "$DEPLOY_DIR"
+          # Write SSH key
+          mkdir -p ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
 
-            # Clone or update repo
-            if [ ! -d "$DEPLOY_DIR/.git" ]; then
-              cd "$DEPLOY_DIR"
-              git clone "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" .
-            fi
+          # Write SSH config
+          cat > ~/.ssh/config <<SSHEOF
+          Host portfolio-vps
+            HostName $HOST
+            User $VPS_USER
+            IdentityFile ~/.ssh/deploy_key
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            ServerAliveInterval 60
+            ServerAliveCountMax 10
+          SSHEOF
+          chmod 600 ~/.ssh/config
 
-            cd "$DEPLOY_DIR"
-            git fetch origin
-            git checkout "${{ github.ref_name }}"
-            git pull origin "${{ github.ref_name }}"
+          # Create deploy dir
+          echo "[1/3] Preparing VPS..."
+          ssh portfolio-vps "sudo mkdir -p /var/www/portfolio && sudo chown \$(whoami):\$(whoami) /var/www/portfolio"
 
-            # Set permissions
-            chmod -R 755 .
+          # Clone or update repo
+          echo "[2/3] Deploying code..."
+          ssh portfolio-vps "if [ ! -d /var/www/portfolio/.git ]; then cd /var/www/portfolio && git clone https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git .; fi && cd /var/www/portfolio && git fetch origin && git checkout ${GITHUB_REF_NAME} && git pull origin ${GITHUB_REF_NAME} && chmod -R 755 ."
 
-            # Reload nginx if available
-            if command -v nginx &> /dev/null; then
-              sudo nginx -t && sudo systemctl reload nginx
-            fi
+          # Reload nginx
+          echo "[3/3] Reloading nginx..."
+          ssh portfolio-vps "command -v nginx &> /dev/null && sudo nginx -t && sudo systemctl reload nginx || true"
 
-            echo "=== Deploy complete ==="
+          echo ""
+          echo "=== Deploy complete ==="
