@@ -58,14 +58,16 @@ jobs:
         run: |
           set -e
 
-          # Normalize host: remove everything up to :// and all trailing slashes
+          # Normalize host
           HOST="$VPS_HOST_RAW"
-          # Remove protocol prefix (everything before and including ://)
+          # Remove protocol prefix
           if [[ "$HOST" == *://* ]]; then
             HOST="${HOST##*://}"
           fi
-          # Remove ALL trailing slashes
-          HOST="${HOST%%[!/]}"
+          # Remove trailing slashes one by one
+          while [[ "$HOST" == */ ]]; do
+            HOST="${HOST%/}"
+          done
 
           echo "=== Portfolio Deploy ==="
           echo "Branch: ${{ github.ref_name }}"
