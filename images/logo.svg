@@ -1,12 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 40" width="220" height="40">
-  <!-- Background circle for image -->
-  <circle cx="20" cy="20" r="16" fill="#1e1e26" stroke="#ff6b35" stroke-width="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 40" width="200" height="40">
+  <defs>
+    <clipPath id="circle-clip">
+      <circle cx="20" cy="20" r="14"/>
+    </clipPath>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="20" cy="20" r="15" fill="#1e1e26" stroke="#ff6b35" stroke-width="1.5"/>
   <!-- Image clipped to circle -->
-  <clipPath id="circle-clip">
-    <circle cx="20" cy="20" r="15"/>
-  </clipPath>
-  <image href="images/1629468109932.jfif" x="5" y="5" width="30" height="30" clip-path="url(#circle-clip)" preserveAspectRatio="xMidYMid slice"/>
-  <!-- Text: Patrick (white) + Martins (accent) -->
-  <text x="42" y="25" font-family="'Syne', sans-serif" font-size="15" font-weight="800" fill="#e8e6f0">Patrick</text>
-  <text x="112" y="25" font-family="'Syne', sans-serif" font-size="15" font-weight="800" fill="#ff6b35">Martins</text>
+  <image href="images/1629468109932.jfif" x="4" y="4" width="32" height="32" clip-path="url(#circle-clip)" preserveAspectRatio="xMidYMid slice"/>
+  <!-- Text -->
+  <text x="40" y="24" font-family="'Syne', sans-serif" font-size="14" font-weight="800" fill="#e8e6f0">Patrick</text>
+  <text x="106" y="24" font-family="'Syne', sans-serif" font-size="14" font-weight="800" fill="#ff6b35">Martins</text>
 </svg>
