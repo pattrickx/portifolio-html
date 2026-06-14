@@ -99,20 +99,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
   text-decoration: none;
 }
 .navbar__logo {
-  height: 32px;
-  width: 32px;
-  border-radius: 50%;
-  object-fit: cover;
+  height: 36px;
+  width: auto;
   flex-shrink: 0;
 }
-.navbar__name {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--text);
-  letter-spacing: -0.02em;
-}
-.navbar__name em { font-style: normal; color: var(--accent); }
 .navbar__links {
   display: flex;
   align-items: center;
@@ -501,19 +491,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); }
   gap: 4px;
 }
 .footer__logo {
-  height: 28px;
-  width: 28px;
-  border-radius: 50%;
-  object-fit: cover;
+  height: 24px;
+  width: auto;
   flex-shrink: 0;
 }
-.footer__name {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 800;
-  color: var(--text);
-}
-.footer__name em { font-style: normal; color: var(--accent); }
 .footer__copy {
   font-family: var(--font-display);
   font-size: 0.78rem;
