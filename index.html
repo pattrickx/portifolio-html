@@ -13,8 +13,320 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-9THNRH9Z40"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag(){datalayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-9THNRH9Z40');
   </script>
+
 </head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       NAVBAR
+       ════════════════════════════════════════════ -->
+  <header class="navbar">
+    <div class="navbar__inner">
+      <a href="index.html" class="navbar__brand">
+        <img src="images/logo.svg" alt="Patrick Martins" class="navbar__logo">
+      </a>
+      <nav class="navbar__links">
+        <a href="#projects" class="navbar__link navbar__link--active">Projects</a>
+        <a href="side-projects.html" class="navbar__link">Side Projects</a>
+        <a href="#about" class="navbar__link">About</a>
+        <a href="#contact" class="navbar__link">Contact</a>
+      </nav>
+      <div class="navbar__social">
+        <a href="https://www.linkedin.com/in/patrick-m-lima/" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a href="https://github.com/pattrickx" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════
+       HERO
+       ════════════════════════════════════════════ -->
+  <section class="hero">
+    <div class="container">
+      <p class="hero__greeting fade-in">Hello, I'm</p>
+      <h1 class="hero__name fade-in fade-in-delay-1">Patrick Martins</h1>
+      <p class="hero__title fade-in fade-in-delay-2">Sr Data Scientist · AI Engineer · Consultant</p>
+      <p class="hero__desc fade-in fade-in-delay-3">
+        Building intelligent systems at the intersection of Machine Learning, Computer Vision, and NLP.
+        I turn complex data into production-ready AI solutions — from research to deployment.
+      </p>
+      <div class="hero__actions fade-in fade-in-delay-4">
+        <a href="#projects" class="btn-primary">View Projects</a>
+        <a href="pdfs/Resume Patrick Martins.pdf" class="btn-ghost" target="_blank" rel="noopener">Download Resume</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       FEATURED PROJECTS
+       ════════════════════════════════════════════ -->
+  <section id="projects" class="section">
+    <div class="container">
+      <h2 class="section__title">Featured Projects</h2>
+      <p class="section__subtitle">Selected work in AI, data science, and software engineering — from production SaaS to academic research.</p>
+
+      <div class="projects-grid">
+
+        <!-- Fishing Data Analysis -->
+        <article class="project-card">
+          <a href="https://medium.com/@pattrickpx99/deep-analysis-of-fishing-data-67dc43de5cac" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/fishing_hotspots.png" alt="Fishing Data Analysis" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Data Science</span>
+              <span class="project-card__tag">Spatial Analysis</span>
+              <span class="project-card__tag">GIS</span>
+            </div>
+            <h3 class="project-card__title"><a href="https://medium.com/@pattrickpx99/deep-analysis-of-fishing-data-67dc43de5cac" target="_blank" rel="noopener">Deep Analysis of Fishing Data</a></h3>
+            <p class="project-card__desc">Spatial and temporal analysis of AIS fishing data. Hotspot detection using Getis-Ord Gi*, clustering, and cartographic visualizations for monitoring and decision-making.</p>
+            <div class="project-card__links">
+              <a href="https://medium.com/@pattrickpx99/deep-analysis-of-fishing-data-67dc43de5cac" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Article
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Computer Vision for Claims -->
+        <article class="project-card">
+          <a href="pdfs/Use of Computer Vision for Claims Adjustment Automation.pdf" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/tcc.png" alt="Computer Vision for Claims Automation" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Computer Vision</span>
+              <span class="project-card__tag">OCR</span>
+              <span class="project-card__tag">NLP</span>
+            </div>
+            <h3 class="project-card__title"><a href="pdfs/Use of Computer Vision for Claims Adjustment Automation.pdf" target="_blank" rel="noopener">CV for Claims Automation</a></h3>
+            <p class="project-card__desc">Intelligent document processing using OCR, computer vision, and NLP. Automates header extraction, signature/stamp detection, and textual analysis for a large health insurance provider.</p>
+            <div class="project-card__links">
+              <a href="pdfs/Use of Computer Vision for Claims Adjustment Automation.pdf" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Paper
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Legal Case Summarizer -->
+        <article class="project-card">
+          <a href="pdfs/Apresentação - Sumarizador 11-2022.pdf" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/Image 2026-05-13 at 22.54.12.jpeg" alt="Legal Case Summarizer" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">NLP</span>
+              <span class="project-card__tag">Deep Learning</span>
+              <span class="project-card__tag">T5/BERT</span>
+            </div>
+            <h3 class="project-card__title"><a href="pdfs/Apresentação - Sumarizador 11-2022.pdf" target="_blank" rel="noopener">Legal Case Summarizer</a></h3>
+            <p class="project-card__desc">Automatic summarization system for Brazilian Federal Supreme Court (STF) rulings using T5 and BERT. Compares machine-generated summaries with human-written references.</p>
+            <div class="project-card__links">
+              <a href="pdfs/Apresentação - Sumarizador 11-2022.pdf" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Paper
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Data Mining in Financial Documents -->
+        <article class="project-card">
+          <a href="pdfs/Data Mining in Financial Documents.pdf" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/WhatsApp Image 2026-05-14 at 12.57.19.jpeg" alt="Data Mining in Financial Documents" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">LLM</span>
+              <span class="project-card__tag">OCR</span>
+              <span class="project-card__tag">Automation</span>
+            </div>
+            <h3 class="project-card__title"><a href="pdfs/Data Mining in Financial Documents.pdf" target="_blank" rel="noopener">Data Mining — Financial Docs</a></h3>
+            <p class="project-card__desc">AI-powered invoice processing with OCR, NLP, and LLM workflows. Automates data extraction, classification, and report generation from financial documents.</p>
+            <div class="project-card__links">
+              <a href="pdfs/Data Mining in Financial Documents.pdf" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Paper
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Road Features Detection -->
+        <article class="project-card">
+          <a href="pdfs/A computer vision model for detecting road features in satellite images.pdf" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/A computer vision model for detecting road features in satellite images.png" alt="Road Features Detection" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Computer Vision</span>
+              <span class="project-card__tag">Segmentation</span>
+              <span class="project-card__tag">Satellite</span>
+            </div>
+            <h3 class="project-card__title"><a href="pdfs/A computer vision model for detecting road features in satellite images.pdf" target="_blank" rel="noopener">Road Features Detection</a></h3>
+            <p class="project-card__desc">AI-based solution to detect, segment, and reconstruct road networks from satellite imagery. Combines segmentation models with geometric analysis for smart-city applications.</p>
+            <div class="project-card__links">
+              <a href="pdfs/A computer vision model for detecting road features in satellite images.pdf" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Paper
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Livestock Counting -->
+        <article class="project-card">
+          <a href="pdfs/AI-powered livestock counting solution.pdf" target="_blank" rel="noopener" class="project-card__img-wrap">
+            <img src="images/AI-powered livestock counting solution.png" alt="AI Livestock Counting" class="project-card__img" loading="lazy">
+          </a>
+          <div class="project-card__body">
+            <div class="project-card__tags">
+              <span class="project-card__tag">Computer Vision</span>
+              <span class="project-card__tag">Drones</span>
+              <span class="project-card__tag">Detection</span>
+            </div>
+            <h3 class="project-card__title"><a href="pdfs/AI-powered livestock counting solution.pdf" target="_blank" rel="noopener">AI Livestock Counting</a></h3>
+            <p class="project-card__desc">Drone-based livestock counting using computer vision. Automates animal detection and counting with high accuracy, reducing operational time, labor, and animal stress.</p>
+            <div class="project-card__links">
+              <a href="pdfs/AI-powered livestock counting solution.pdf" target="_blank" rel="noopener" class="project-card__link">
+                <svg viewBox="0 0 24 24"><path d="M14 3v2H5v14h14v-9h2v10a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1h10zm7 0v8h-2V6.414l-8.293 8.293-1.414-1.414L17.586 5H13V3h8z"/></svg>
+                Read Paper
+              </a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       ABOUT
+       ════════════════════════════════════════════ -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section__title">About</h2>
+      <div class="about-grid">
+        <div class="about__bio">
+          <p>
+            I'm a <strong>Senior Data Scientist and AI Engineer</strong> with deep expertise in building
+            end-to-end machine learning systems — from data exploration and model development to
+            production deployment and monitoring.
+          </p>
+          <p>
+            My work spans <strong>Computer Vision</strong> (object detection, segmentation, satellite imagery),
+            <strong>Natural Language Processing</strong> (summarization, document processing, LLMs),
+            and <strong>Spatial Data Science</strong> (GIS analysis, hotspot detection, clustering).
+          </p>
+          <p>
+            I also build <strong>full-stack AI products</strong> — including SaaS platforms like
+            <a href="https://resumematch.shrimpdev.com" target="_blank" rel="noopener" class="about-link">ResumeMatch</a>,
+            <a href="https://mediahandler.shrimpdev.com" target="_blank" rel="noopener" class="about-link">Media Handler</a>,
+            and side projects like
+            <a href="https://blog.shrimpdev.com" target="_blank" rel="noopener" class="about-link">Shrimp Dev Blog</a>
+            and <a href="https://promo-miner.shrimpdev.com" target="_blank" rel="noopener" class="about-link">Promo Finder</a>
+            — using modern stacks (FastAPI, React, Docker, Cloudflare).
+          </p>
+        </div>
+        <div>
+          <h3 class="skills-heading">Skills &amp; Technologies</h3>
+          <div class="skills-list">
+            <span class="skill-tag">Python</span>
+            <span class="skill-tag">Machine Learning</span>
+            <span class="skill-tag">Deep Learning</span>
+            <span class="skill-tag">Computer Vision</span>
+            <span class="skill-tag">NLP</span>
+            <span class="skill-tag">LLMs</span>
+            <span class="skill-tag">Data Analysis</span>
+            <span class="skill-tag">Spatial Analysis</span>
+            <span class="skill-tag">FastAPI</span>
+            <span class="skill-tag">React</span>
+            <span class="skill-tag">TypeScript</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">PostgreSQL</span>
+            <span class="skill-tag">PyTorch</span>
+            <span class="skill-tag">TensorFlow</span>
+            <span class="skill-tag">scikit-learn</span>
+            <span class="skill-tag">OpenCV</span>
+            <span class="skill-tag">OCR</span>
+            <span class="skill-tag">Git</span>
+            <span class="skill-tag">Cloudflare</span>
+            <span class="skill-tag">Nginx</span>
+            <span class="skill-tag">Linux</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       CONTACT
+       ════════════════════════════════════════════ -->
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="section__title">Get in Touch</h2>
+      <p class="section__subtitle">Open to consulting, collaborations, and interesting projects.</p>
+
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="contact-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M3 3h18a1 1 0 011 1v16a1 1 0 01-1 1H3a1 1 0 01-1-1V4a1 1 0 011-1zm17 4.238l-7.928 7.1L4 7.216V19h16V7.238zM4.511 5l7.55 6.662L19.502 5H4.511z"/></svg>
+          </div>
+          <p class="contact-card__label">Email</p>
+          <p class="contact-card__value"><a href="mailto:pattrickpx99@gmail.com">pattrickpx99@gmail.com</a></p>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+          <p class="contact-card__label">LinkedIn</p>
+          <p class="contact-card__value"><a href="https://www.linkedin.com/in/patrick-m-lima/" target="_blank" rel="noopener">patrick-m-lima</a></p>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+          </div>
+          <p class="contact-card__label">GitHub</p>
+          <p class="contact-card__value"><a href="https://github.com/pattrickx" target="_blank" rel="noopener">pattrickx</a></p>
+        </div>
+        <div class="contact-card">
+          <div class="contact-card__icon">
+            <svg viewBox="0 0 24 24"><path d="M19.05 4.91A9.816 9.816 0 0012.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01zm-7.01 15.24c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.264 8.264 0 01-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24 2.2 0 4.27.86 5.82 2.42a8.183 8.183 0 012.41 5.83c.02 4.54-3.68 8.24-8.22 8.24zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.78.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.22.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.14-1.18-.06-.11-.23-.17-.48-.29z"/></svg>
+          </div>
+          <p class="contact-card__label">WhatsApp</p>
+          <p class="contact-card__value"><a href="https://wa.me/5585985311011" target="_blank" rel="noopener">+55 (85) 9 8531-1011</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════
+       FOOTER
+       ════════════════════════════════════════════ -->
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <img src="images/logo.svg" alt="Patrick Martins" class="footer__logo">
+      </div>
+      <p class="footer__copy">© 2026 Patrick Martins. All rights reserved.</p>
+      <div class="footer__links">
+        <a href="https://resumematch.shrimpdev.com" class="footer__link" target="_blank" rel="noopener">ResumeMatch</a>
+        <a href="https://mediahandler.shrimpdev.com" class="footer__link" target="_blank" rel="noopener">Media Handler</a>
+        <a href="side-projects.html" class="footer__link">Side Projects</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
